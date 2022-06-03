@@ -1,5 +1,5 @@
 // const { fileSizes } = require('../config/keys');
-require('dotenv').config();
+// require('dotenv').config();
 const httpStatus = require('http-status');
 const otherHelper = require('./others.helper');
 const multer = require('multer');

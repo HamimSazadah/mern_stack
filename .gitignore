@@ -3,9 +3,11 @@ node_modules/
 .idea/
 .git-rewrite/
 *lock.json
+*lock.yaml
 yarn.lock
 .expo/
 build
 .env
 client-app/.parcel-cache/data.mdb
 .DS_Store
+mongodb
