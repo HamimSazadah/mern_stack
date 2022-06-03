@@ -3,6 +3,11 @@ const otherHelper = require('../../helper/others.helper');
 const contentSch = require('./contentSchema');
 const contentConfig = require('./contentConfig');
 const contentController = {};
+const r = require('redis')
+
+const redis = r.createClient({ url: process.env.REDIS_HOST || 'redis://127.0.0.1:6379' });
+redis.on('error', (err) => console.log('Redis Client Error', err));
+redis.connect();
 
 contentController.GetContent = async (req, res, next) => {
   try {
@@ -72,8 +77,17 @@ contentController.GetContentForCounter = async (req, res, next) => {
 contentController.GetContentByKey = async (req, res, next) => {
   try {
     const key = req.params.key;
-    const contents = await contentSch.findOne({ key, is_deleted: false, is_active: true }).populate([{ path: 'image' }]);
-    return otherHelper.sendResponse(res, httpStatus.OK, true, contents ? contents : { key: req.params.key, description: `<div class="text-sm border border-red-100 bg-red-50 rounded px-2 py-1 text-red-600 inline-block m-4">Content not found [key=${req.params.key}]</div>` }, null, contentConfig.get, null);
+    const redisId = `contents:${key}`;
+    const getRedis = await redis.get(redisId);
+    var contents = { key: req.params.key, description: `<div class="text-sm border border-red-100 bg-red-50 rounded px-2 py-1 text-red-600 inline-block m-4">Content not found [key=${req.params.key}]</div>` };
+    if (getRedis) {
+      contents = JSON.parse(getRedis);
+    } else {
+      contents = await contentSch.findOne({ key, is_deleted: false, is_active: true }).populate([{ path: 'image' }]);
+      await redis.set(redisId, JSON.stringify(contents));
+      await redis.expire(redisId,3600) //expire in 1 hour
+    }
+    return otherHelper.sendResponse(res, httpStatus.OK, true, contents, null, contentConfig.get, null);
   } catch (err) {
     next(err);
   }
