@@ -11,3 +11,4 @@ build
 client-app/.parcel-cache/data.mdb
 .DS_Store
 mongodb
+elasticsearch

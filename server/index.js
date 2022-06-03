@@ -2,6 +2,10 @@
  *      Server Starts From Here                        *
  *******************************************************/
 'use strict';
+const apm = require('elastic-apm-node').start({
+  serviceName: process.env.APM_NAME || 'Backend-service',
+  serverUrl: 'http://apm:8200',
+})
 
 // require('dotenv').config();
 const http = require('http');
@@ -9,6 +13,7 @@ const app = require('./app');
 const port = process.env.PORT || 5050;
 const env = process.env.ENV || 'Development';
 const app_name = process.env.APP_NAME || 'Waft Engine Server';
+
 const server = http.createServer(app);
 
 app.set('PORT_NUMBER', port);
