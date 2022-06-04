@@ -1,5 +1,16 @@
 version: "3"
 services:
+  minio:
+    image: telkomindonesia/debian:minio-1.0
+    ports:
+      - 9000:9000
+    volumes:
+      - ./minio:/data/minio
+    container_name: minio
+    environment:
+      - MINIO_ACCESS_KEY=Test1234567
+      - MINIO_SECRET_KEY=Test1234567
+      - MINIO_BROWSER=on
   redis:
     image: redis
     container_name: redis
@@ -36,14 +47,15 @@ services:
     - 5601:5601
 
   fe:
-   image: telkomindonesia/alpine:nginx-1.12.2-novol
+   image: nginx
    ports:
-    - 8081:8080
+    - 8081:80
    env_file:
     - ./client/.env
    container_name: frontend
    volumes:
-    -  ./client/dist/:/var/www/data/html
+    - ./nginx.conf:/etc/nginx/nginx.conf
+    -  ./client/dist/:/usr/share/nginx/html
    depends_on:
     - be
   be:

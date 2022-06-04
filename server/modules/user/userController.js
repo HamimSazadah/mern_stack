@@ -12,6 +12,14 @@ const accessSch = require('../role/accessSchema');
 const moduleSch = require('../role/moduleSchema');
 const loginLogs = require('./loginlogs/loginlogController').internal;
 const { getSetting } = require('../../helper/settings.helper');
+const Minio = require("minio");
+const minioClient = new Minio.Client({
+  endPoint: process.env.MINIO_HOST || '127.0.0.1',
+  port: parseInt(process.env.MINIO_PORT) || 9000,
+  useSSL: false,
+  accessKey: process.env.MINIO_ACCESS_KEY || 'Test1234567',
+  secretKey: process.env.MINIO_SECRET_KEY || 'Test1234567'
+});
 
 const userController = {};
 
@@ -670,6 +678,10 @@ userController.GetProfile = async (req, res, next) => {
   try {
     let populate = [{ path: 'roles', select: '_id role_title' }];
     const userProfile = await userSch.findById(req.user.id, 'image name date_of_birth email added_at email_verified roles is_two_fa ').populate(populate);
+    minioClient.presignedUrl('GET', 'files', userProfile.image.objectName, 60, function (err, presignedUrl) { // expire 60s
+      if (err) return console.log(err)
+      userProfile.image.path = presignedUrl
+    })
     return otherHelper.sendResponse(res, httpStatus.OK, true, userProfile, null, null, null);
   } catch (err) {
     next(err);

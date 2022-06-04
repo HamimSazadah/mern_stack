@@ -5,6 +5,16 @@ const otherHelper = require('./others.helper');
 const multer = require('multer');
 const maxFileSize = process.env.maxFileSize || 1000000000;
 const uploaderHelper = {};
+const Minio = require("minio");
+const multerMinIOStorage = require('multer-minio-storage-engine')
+const minioClient = new Minio.Client({
+  endPoint: process.env.MINIO_HOST || '127.0.0.1',
+  port: parseInt(process.env.MINIO_PORT) || 9000,
+  useSSL: false,
+  accessKey: process.env.MINIO_ACCESS_KEY || 'Test1234567',
+  secretKey: process.env.MINIO_SECRET_KEY || 'Test1234567'
+});
+
 
 let mimeType = {
   'image/png': 'png',
@@ -18,13 +28,19 @@ let mimeType = {
 };
 uploaderHelper.uploadFiles = (destinationPath, uploadTYpe, fieldData) => {
   const temp = maxFileSize / (1024 * 1024);
-  var storage = multer.diskStorage({
-    destination: destinationPath,
-    filename: async (req, file, cb) => {
-      const randomString = await otherHelper.generateRandomHexString(15);
-      cb(null, randomString + '-' + file.originalname);
+  var uploadTYpe = 'single'
+
+  var storage = multerMinIOStorage({
+    minio: minioClient,
+    bucketName: 'files',
+    metaData: function (req, file, cb) {
+      cb(null, { fieldName: file.fieldname });
     },
-  });
+    objectName: async (req, file, cb)=> {
+      const randomString = await otherHelper.generateRandomHexString(15);
+      cb(null,randomString + '-' + file.originalname)
+    }
+  })
   const uploader = multer({
     storage: storage,
     fileFilter: function (req, file, callback) {

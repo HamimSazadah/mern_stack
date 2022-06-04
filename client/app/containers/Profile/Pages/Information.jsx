@@ -40,7 +40,7 @@ const UserPersonalInformationPage = (props) => {
 
   useEffect(() => {
     if (one.image && one.image.path) {
-      setImage(`${IMAGE_BASE}${one.image.path}`);
+      setImage(`${one.image.path}`);
     }
   }, [one]);
 

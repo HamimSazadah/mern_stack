@@ -13,3 +13,4 @@ client-app/.parcel-cache/data.mdb
 mongodb
 elasticsearch
 redis
+minio
