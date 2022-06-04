@@ -2,10 +2,6 @@
  *      Server Starts From Here                        *
  *******************************************************/
 'use strict';
-const apm = require('elastic-apm-node').start({
-  serviceName: process.env.APM_NAME || 'Backend-service',
-  serverUrl: 'http://apm:8200',
-})
 
 // require('dotenv').config();
 const http = require('http');

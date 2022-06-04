@@ -12,11 +12,17 @@ const mongoose = require('mongoose');
 const passport = require('passport');
 const hpp = require('hpp');
 const httpStatus = require('http-status');
-const mongoURI = process.env.MONGODB_URI;
+const mongoURI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/waft-engine';
 const otherHelper = require('./helper/others.helper');
 const { AddErrorToLogs } = require('./modules/bug/bugController');
 const changephoto = require('./helper/photomanipulate').changephoto;
 const { initSettings } = require('./helper/settings.helper');
+
+const apm = require('elastic-apm-node').start({
+  serviceName: process.env.APM_NAME || 'Backend-service',
+  serverUrl: process.env.APM_URL ||'http://127.0.0.1:8200'
+})
+
 const app = express();
 // Logger middleware
 app.use(logger('dev'));
