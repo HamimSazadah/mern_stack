@@ -1,15 +1,18 @@
-start with installing the dependencies with:
-`yarn install`
+# Prerequisite 
+[Docker-compose](https://docs.docker.com/compose/install/)
 
-Copy .env.example to .env and change the values to match your environment.
+# Architecture 
+![alt](https://github.com/HamimSazadah/mern_stack/blob/master/images/architectur.jpg)
 
-Then run the following commands to start the server:
+# How to run
+1. `docker-compose up -d` wait until all service ready
+2. in pod mongodb `cd /db && mongorestore`
+3. in pod elasticsearch `./bin/elasticsearch-setup-passwords interactive` update all password with **Test123**
+4. login into kibana(`http://localhost:5601/`) with username `elastic` password `Test123`
+5. goto menu APM in Kibana and add APM agent
+6. add bucket **files** in minino `http://loaclhost:9000` with access key = `Test1234567` and secret key = `Test1234567`
+7. open browser `http://loaclhost:8081/` and login with Email : `admin@waftengine.org` , Password : `Test@1234`
+8. happy Exploring :)
 
-- Run the development server in default port 1234 with:
-  `yarn start`
 
-- Run the development server in specifig port eg. 5051 with:
-  `PORT=5051 yarn start`
-
-- Run the build with:
-  `yarn build`
+Source React and Express :  [WaftEngine](https://github.com/WaftTech/WaftEngine)
